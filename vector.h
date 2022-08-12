@@ -4,24 +4,24 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define vector(type) struct { \
+#define vec_t(type) struct { \
   type *data; \
   int size; \
   int length; \
 }
 
-#define vinit(vec) { \
+#define vec_init(vec) { \
   memset(&vec, 0, sizeof(vec)); \
   vec.data = malloc((++vec.size)*sizeof(*vec.data)); \
 }
 
-#define vpush(vec, v) { \
+#define vec_push(vec, v) { \
   if (vec.size == vec.length) \
     vec.data = realloc(vec.data, ++vec.size); \
   vec.data[vec.length++] = v; \
 }
 
-#define vpop(vec, i) { \
+#define vec_pop(vec, i) { \
   if (i != vec.length-1) \
     memmove( \
       &vec.data[i], \
@@ -31,16 +31,16 @@
   vec.length--; \
 }
 
-#define vpopb(vec) vpop(vec, vec.length-1)
+#define vec_popb(vec) vec_pop(vec, vec.length-1)
 
-#define vget(vec, i) vec.data[i]
+#define vec_get(vec, i) vec.data[i]
 
-#define vshrink(vec) { \
+#define vec_shrink(vec) { \
   void *ptr = realloc(vec.data, vec.length*sizeof(*vec.data)); \
   if (ptr != NULL) vec.data = ptr; \
   vec.size = vec.length; \
 }
 
-#define vfree(vec) free(vec.data)
+#define vec_free(vec) free(vec.data)
 
 #endif
