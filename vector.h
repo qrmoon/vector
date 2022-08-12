@@ -17,7 +17,7 @@
 
 #define vec_push(vec, v) { \
   if (vec.size == vec.length) \
-    vec.data = realloc(vec.data, ++vec.size); \
+    vec.data = realloc(vec.data, (++vec.size)*sizeof(*vec.data)); \
   vec.data[vec.length++] = v; \
 }
 
