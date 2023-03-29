@@ -11,5 +11,6 @@ int main() {
   vec_push(v, 3);
   vec_popb(v);
   vec_shrink(v);
+  vec_insert(v, 1, 10);
   printf("%d\n", vec_get(v, 1));
 }

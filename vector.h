@@ -21,6 +21,13 @@
   vec.data[vec.length++] = v; \
 }
 
+#define vec_insert(vec, i, v) { \
+  if (vec.size == vec.length) \
+    vec.data = realloc(vec.data, (++vec.size)*sizeof(*vec.data)); \
+  memmove(vec.data+i+1, vec.data+i, vec.size-i); \
+  vec.data[i] = v; \
+}
+
 #define vec_pop(vec, i) { \
   if (i != vec.length-1) \
     memmove( \
