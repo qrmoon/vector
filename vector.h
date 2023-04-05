@@ -26,6 +26,7 @@
     vec.data = realloc(vec.data, (++vec.size)*sizeof(*vec.data)); \
   memmove(vec.data+i+1, vec.data+i, vec.size-i); \
   vec.data[i] = v; \
+  vec.length++; \
 }
 
 #define vec_pop(vec, i) { \
