@@ -1,6 +1,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -8,25 +9,39 @@
   type *data; \
   int size; \
   int length; \
+  bool log_growth; \
 }
 
 #define vec_init(vec) { \
   memset(&vec, 0, sizeof(vec)); \
   vec.data = malloc((++vec.size)*sizeof(*vec.data)); \
+  vec.log_growth = true; \
 }
 
 #define vec_push(vec, v) { \
+  size_t size = vec.log_growth ? vec.size * 2 : vec.size + 1; \
+  void *ptr = vec.data; \
   if (vec.size == vec.length) \
-    vec.data = realloc(vec.data, (++vec.size)*sizeof(*vec.data)); \
-  vec.data[vec.length++] = v; \
+    ptr = realloc(vec.data, size * sizeof(*vec.data)); \
+  if (ptr) { \
+    vec.data = ptr; \
+    vec.size = size; \
+    vec.data[vec.length++] = v; \
+  } \
 }
 
 #define vec_insert(vec, i, v) { \
+  size_t size = vec.log_growth ? vec.size * 2 : vec.size + 1; \
+  void *ptr = vec.data; \
   if (vec.size == vec.length) \
-    vec.data = realloc(vec.data, (++vec.size)*sizeof(*vec.data)); \
-  memmove(vec.data+i+1, vec.data+i, vec.size-i); \
-  vec.data[i] = v; \
-  vec.length++; \
+    ptr = realloc(vec.data, (++vec.size)*sizeof(*vec.data)); \
+  if (ptr) { \
+    vec.data = ptr; \
+    vec.size = size; \
+    memmove(vec.data+i+1, vec.data+i, vec.size-i); \
+    vec.data[i] = v; \
+    vec.length++; \
+  } \
 }
 
 #define vec_pop(vec, i) { \
@@ -44,9 +59,15 @@
 #define vec_get(vec, i) vec.data[i]
 
 #define vec_shrink(vec) { \
-  void *ptr = realloc(vec.data, vec.length*sizeof(*vec.data)); \
-  if (ptr != NULL) vec.data = ptr; \
-  vec.size = vec.length; \
+  /* for logarithmic grows, use */ \
+  /* the smallest multiple of 2 */ \
+  /* larger than vec.length */ \
+  size_t size = vec.log_growth ? vec.length >> 1 << 2 : vec.length; \
+  void *ptr = realloc(vec.data, size*sizeof(*vec.data)); \
+  if (ptr != NULL) { \
+    vec.data = ptr; \
+    vec.size = size; \
+  } \
 }
 
 #define vec_free(vec) free(vec.data)
