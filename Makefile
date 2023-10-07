@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -Wpedantic
-LFLAGS=
+LFLAGS=-lm
 
 build: main.c
 	$(CC) $^ $(CFLAGS) $(LFLAGS) -o $@

@@ -1,6 +1,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -65,7 +66,8 @@
   /* for logarithmic grows, use */ \
   /* the smallest multiple of 2 */ \
   /* larger than vec.length */ \
-  size_t size = (vec).log_growth ? (vec).length >> 1 << 2 : (vec).length; \
+  size_t size = \
+    (vec).log_growth ? (int)pow(2, log2(vec.length)) : (vec).length; \
   if ((vec).size != size) { \
     void *ptr = realloc((vec).data, size*sizeof(*(vec).data)); \
     if (ptr != NULL) { \
