@@ -7,15 +7,17 @@
 
 #define vec_t(type) struct { \
   type *data; \
-  int size; \
-  int length; \
+  size_t size; \
+  size_t length; \
   bool log_growth; \
+  bool auto_shrink; \
 }
 
 #define vec_init(vec) { \
   memset(&vec, 0, sizeof(vec)); \
   vec.data = malloc((++vec.size)*sizeof(*vec.data)); \
   vec.log_growth = true; \
+  vec.auto_shrink = true; \
 }
 
 #define vec_push(vec, v) { \
@@ -52,6 +54,7 @@
       (vec.length-i-1)*sizeof(*vec.data) \
     ); \
   vec.length--; \
+  if (vec.auto_shrink) vec_shrink(vec); \
 }
 
 #define vec_popb(vec) vec_pop(vec, vec.length-1)
@@ -63,10 +66,12 @@
   /* the smallest multiple of 2 */ \
   /* larger than vec.length */ \
   size_t size = vec.log_growth ? vec.length >> 1 << 2 : vec.length; \
-  void *ptr = realloc(vec.data, size*sizeof(*vec.data)); \
-  if (ptr != NULL) { \
-    vec.data = ptr; \
-    vec.size = size; \
+  if (vec.size != size) { \
+    void *ptr = realloc(vec.data, size*sizeof(*vec.data)); \
+    if (ptr != NULL) { \
+      vec.data = ptr; \
+      vec.size = size; \
+    } \
   } \
 }
 
