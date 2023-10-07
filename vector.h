@@ -1,7 +1,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,15 +15,22 @@
 
 #define vec_init(vec) { \
   memset(&vec, 0, sizeof(vec)); \
+  (vec).size = 0; \
+  (vec).length = 0; \
   (vec).data = malloc((++(vec).size)*sizeof(*(vec).data)); \
   (vec).log_growth = true; \
-  (vec).auto_shrink = true; \
+  (vec).auto_shrink = false; \
 }
 
 #define vec_push(vec, v) { \
-  size_t size = (vec).log_growth ? (vec).size * 2 : (vec).size + 1; \
+  size_t size = (vec).size; \
+  if ((vec).length + 1 > size) { \
+    if ((vec).log_growth) \
+      size *= 2; \
+    else size++; \
+  } \
   void *ptr = (vec).data; \
-  if ((vec).size == (vec).length) \
+  if (size != (vec).size) \
     ptr = realloc((vec).data, size * sizeof(*(vec).data)); \
   if (ptr) { \
     (vec).data = ptr; \
@@ -34,10 +40,15 @@
 }
 
 #define vec_insert(vec, i, v) { \
-  size_t size = (vec).log_growth ? (vec).size * 2 : (vec).size + 1; \
+  size_t size = (vec).size; \
+  if ((vec).length + 1 > size) { \
+    if ((vec).log_growth) \
+      size *= 2; \
+    else size++; \
+  } \
   void *ptr = (vec).data; \
-  if ((vec).size == (vec).length) \
-    ptr = realloc((vec).data, (++(vec).size)*sizeof(*(vec).data)); \
+  if (size != (vec).size) \
+    ptr = realloc((vec).data, size * sizeof(*(vec).data)); \
   if (ptr) { \
     (vec).data = ptr; \
     (vec).size = size; \
@@ -66,10 +77,13 @@
   /* for logarithmic grows, use */ \
   /* the smallest multiple of 2 */ \
   /* larger than vec.length */ \
-  size_t size = \
-    (vec).log_growth ? (int)pow(2, log2(vec.length)) : (vec).length; \
+  size_t size = (vec).size; \
+  if ((vec).log_growth && (vec).length <= size / 2) \
+    size /= 2; \
+  else if (!(vec).log_growth && (vec).length < size) \
+    size--; \
   if ((vec).size != size) { \
-    void *ptr = realloc((vec).data, size*sizeof(*(vec).data)); \
+    void *ptr = realloc((vec).data, size * sizeof(*(vec).data)); \
     if (ptr != NULL) { \
       (vec).data = ptr; \
       (vec).size = size; \
