@@ -74,9 +74,6 @@
 #define vec_get(vec, i) (vec).data[i]
 
 #define vec_shrink(vec) { \
-  /* for logarithmic grows, use */ \
-  /* the smallest multiple of 2 */ \
-  /* larger than vec.length */ \
   size_t size = (vec).size; \
   if ((vec).log_growth && (vec).length <= size / 2) \
     size /= 2; \
